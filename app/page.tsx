@@ -14,6 +14,7 @@ interface BerekenResultaat {
   eindwaarde: number;
   totaalIngelegdBeleggen: number;
   verschil: number;
+  saldoNaInflatie: number;
 }
 
 function formatEuro(bedrag: number): string {
@@ -25,8 +26,9 @@ function formatEuro(bedrag: number): string {
 }
 
 export default function SparenVsBeleggenPage() {
-  const [jaren, setJaren] = useState<number>(15);
+  const [huidigSaldo, setHuidigSaldo] = useState<number | ''>('');
   const [maandbedrag, setMaandbedrag] = useState<number>(10);
+  const [jaren, setJaren] = useState<number>(15);
   const [resultaat, setResultaat] = useState<BerekenResultaat | null>(null);
   const [laden, setLaden] = useState<boolean>(true);
   const [foutmelding, setFoutmelding] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export default function SparenVsBeleggenPage() {
     fetch('/api/bereken', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jaren, maandbedrag }),
+      body: JSON.stringify({ jaren, maandbedrag, huidigSaldo: huidigSaldo === '' ? 0 : huidigSaldo }),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Berekening mislukt');
@@ -66,7 +68,7 @@ export default function SparenVsBeleggenPage() {
     return () => {
       actief = false;
     };
-  }, [jaren, maandbedrag]);
+  }, [jaren, maandbedrag, huidigSaldo]);
 
   // Chart.js laden via CDN
   useEffect(() => {
@@ -182,6 +184,22 @@ export default function SparenVsBeleggenPage() {
           box-shadow: 0 2px 6px rgba(0,0,0,0.25);
           cursor: pointer;
         }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+        input[type="number"]:focus {
+          outline: none;
+        }
+        input[type="number"]::placeholder {
+          color: #999;
+          font-weight: 600;
+        }
       `}</style>
 
       <div style={styles.wrapper}>
@@ -191,25 +209,37 @@ export default function SparenVsBeleggenPage() {
           <div style={styles.headerSub}>Ontdek wat jouw geld doet als je het laat groeien</div>
         </div>
 
-        {/* SLIDERS */}
+        {/* INVOER */}
         <div style={styles.card}>
           <div style={styles.sliderRow}>
-            <div style={styles.sliderLabel}>
-              Hoeveel jaar? <span style={styles.sliderValue}>{jaren} jaar</span>
+            <div style={styles.sliderLabel}>Saldo van spaargeld op je spaarrekening</div>
+            <div style={styles.inputWrapper}>
+              <span style={styles.inputPrefix}>€</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                max="1000000"
+                step="100"
+                placeholder="Bijvoorbeeld 5.000"
+                value={huidigSaldo}
+                onChange={(e) => {
+                  const ruw = e.target.value;
+                  if (ruw === '') {
+                    setHuidigSaldo('');
+                    return;
+                  }
+                  const waarde = Number(ruw);
+                  setHuidigSaldo(Number.isNaN(waarde) ? '' : Math.max(0, Math.min(1000000, waarde)));
+                }}
+                style={styles.inputField}
+              />
             </div>
-            <input
-              type="range"
-              min="1"
-              max="30"
-              step="1"
-              value={jaren}
-              onChange={(e) => setJaren(Number(e.target.value))}
-            />
           </div>
 
           <div style={styles.sliderRow}>
             <div style={styles.sliderLabel}>
-              Hoeveel per maand? <span style={styles.sliderValue}>{formatEuro(maandbedrag)}</span>
+              Hoeveel spaar je per maand? <span style={styles.sliderValue}>{formatEuro(maandbedrag)}</span>
             </div>
             <input
               type="range"
@@ -218,6 +248,21 @@ export default function SparenVsBeleggenPage() {
               step="5"
               value={maandbedrag}
               onChange={(e) => setMaandbedrag(Number(e.target.value))}
+            />
+          </div>
+
+          <div style={{ ...styles.sliderRow, marginBottom: 0 }}>
+            <div style={styles.sliderLabel}>
+              Over hoeveel jaar wil je je vermogen bekijken?{' '}
+              <span style={styles.sliderValue}>{jaren} jaar</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="30"
+              step="1"
+              value={jaren}
+              onChange={(e) => setJaren(Number(e.target.value))}
             />
           </div>
         </div>
@@ -247,8 +292,39 @@ export default function SparenVsBeleggenPage() {
                   </strong>
                   .
                 </div>
+                <div style={styles.warningBlock}>
+                  Let op: een inflatie van <strong>2%</strong> per jaar is <strong>normaal</strong>.
+                  Maar inflatie kan ook <strong>jarenlang hoger</strong> liggen, zoals je de
+                  afgelopen jaren hebt gezien. Hoe hoger de inflatie, hoe <strong>sneller</strong>{' '}
+                  je spaargeld zijn waarde verliest.
+                </div>
               </div>
             </div>
+
+            {/* HUIDIG SPAARSALDO */}
+            {typeof huidigSaldo === 'number' && huidigSaldo > 0 && (
+              <div style={styles.card}>
+                <div style={styles.chartTitle}>Wat doet inflatie met jouw spaarsaldo?</div>
+                <div style={styles.resultRowInner}>
+                  <div style={styles.resultCard}>
+                    <div style={styles.resultLabel}>Huidig spaarsaldo</div>
+                    <div style={{ ...styles.resultValue, color: '#1A1F36' }}>
+                      {formatEuro(huidigSaldo)}
+                    </div>
+                  </div>
+                  <div style={styles.resultCard}>
+                    <div style={styles.resultLabel}>Waard over {jaren} jaar</div>
+                    <div style={{ ...styles.resultValue, color: '#FF6B35' }}>
+                      {formatEuro(resultaat.saldoNaInflatie)}
+                    </div>
+                  </div>
+                </div>
+                <div style={styles.noteText}>
+                  Dit saldo is <strong>niet</strong> meegerekend bij beleggen hieronder. Dat gaat
+                  alleen over je maandelijkse inleg.
+                </div>
+              </div>
+            )}
 
             {/* BELEGGEN UITLEG */}
             <div style={styles.infoBlockDark}>
@@ -397,6 +473,30 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#E21B70',
     fontWeight: 800,
   },
+  inputWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    background: '#F7F7FA',
+    borderRadius: '12px',
+    border: '2px solid #E8E5F0',
+    padding: '12px 14px',
+  },
+  inputPrefix: {
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 800,
+    fontSize: '16px',
+    color: '#6B2D84',
+    marginRight: '8px',
+  },
+  inputField: {
+    border: 'none',
+    background: 'transparent',
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 800,
+    fontSize: '16px',
+    color: '#1A1F36',
+    width: '100%',
+  },
   errorBlock: {
     margin: '0 16px',
     background: '#FFE3E3',
@@ -454,6 +554,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     lineHeight: '1.5',
     color: '#1A1F36',
   },
+  warningBlock: {
+    marginTop: '12px',
+    padding: '12px 14px',
+    background: '#FFE3E3',
+    border: '2px solid #E21B70',
+    borderRadius: '12px',
+    fontFamily: 'Lora, serif',
+    fontSize: '13px',
+    lineHeight: '1.5',
+    color: '#B72452',
+  },
   infoTitleLight: {
     fontFamily: 'Montserrat, sans-serif',
     fontWeight: 800,
@@ -481,6 +592,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '12px',
     margin: '0 16px',
   },
+  resultRowInner: {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    gap: '12px',
+    marginBottom: '14px',
+  },
   resultCard: {
     flex: 1,
     background: '#FFFFFF',
@@ -501,6 +618,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontFamily: 'Montserrat, sans-serif',
     fontWeight: 800,
     fontSize: '20px',
+  },
+  noteText: {
+    fontFamily: 'Lora, serif',
+    fontStyle: 'italic',
+    fontSize: '12px',
+    lineHeight: '1.5',
+    color: '#6B2D84',
+    textAlign: 'center',
   },
   diffBlock: {
     margin: '0 16px',
