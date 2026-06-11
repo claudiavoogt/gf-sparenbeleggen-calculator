@@ -185,12 +185,6 @@ export default function SparenVsBeleggenPage() {
       `}</style>
 
       <div style={styles.wrapper}>
-        {/* LOGO BLOK */}
-        <div style={styles.logoBlock}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/generatie-fearless-logo.png" alt="Generatie Fearless" style={styles.logoImg} />
-        </div>
-
         {/* HEADER */}
         <div style={styles.header}>
           <div style={styles.headerTitle}>Sparen of beleggen?</div>
@@ -298,9 +292,9 @@ export default function SparenVsBeleggenPage() {
             </div>
 
             <div style={styles.diffBlock}>
-              <div style={styles.diffLabel}>Door te beleggen heb je</div>
+              <div style={styles.diffLabel}>Door te beleggen kun je</div>
               <div style={styles.diffValue}>{formatEuro(resultaat.verschil)}</div>
-              <div style={styles.diffLabel}>meer dan met sparen</div>
+              <div style={styles.diffLabel}>meer hebben dan met sparen</div>
             </div>
 
             {kleinVerschil && (
@@ -316,6 +310,18 @@ export default function SparenVsBeleggenPage() {
           Let op: dit is een rekenvoorbeeld. Ook bij beleggen knaagt inflatie, maar het
           rendement ligt veel hoger. Rendementen uit het verleden bieden geen garantie voor de
           toekomst.
+        </div>
+
+        <div style={styles.brandFooter}>
+          <div style={styles.brandFooterText}>
+            <a href="https://claudiavoogt.nl" target="_blank" rel="noopener noreferrer" style={styles.brandFooterLink}>
+              claudiavoogt.nl
+            </a>
+            {' '}— Beleggingsexpert &amp; investeringsmentor
+          </div>
+          <div style={styles.brandFooterCopy}>
+            © {new Date().getFullYear()} Claudia Voogt. Alle rechten voorbehouden. Deze tool mag niet worden gekopieerd, nagebouwd of hergebruikt zonder schriftelijke toestemming.
+          </div>
         </div>
       </div>
     </div>
@@ -535,5 +541,27 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '11px',
     color: '#999',
     textAlign: 'center',
+  },
+  brandFooter: {
+    background: 'linear-gradient(110deg, #1A1F36 0%, #6B2D84 70%, #3EDCB1 100%)',
+    padding: '24px 20px',
+    textAlign: 'center',
+    marginTop: '8px',
+  },
+  brandFooterText: {
+    fontFamily: 'Lora, serif',
+    fontSize: '13px',
+    color: '#cdbcd9',
+  },
+  brandFooterLink: {
+    color: '#3EDCB1',
+    textDecoration: 'underline',
+  },
+  brandFooterCopy: {
+    fontFamily: 'Lora, serif',
+    fontSize: '11px',
+    color: '#cdbcd9',
+    opacity: 0.65,
+    marginTop: '6px',
   },
 };
