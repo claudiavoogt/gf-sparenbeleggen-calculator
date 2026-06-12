@@ -396,7 +396,7 @@ export default function SparenVsBeleggenPage() {
             {' '}— Beleggingsexpert &amp; investeringsmentor
           </div>
           <div style={styles.brandFooterCopy}>
-            © {new Date().getFullYear()} Claudia Voogt. Alle rechten voorbehouden. Deze tool mag niet worden gekopieerd, nagebouwd of hergebruikt zonder schriftelijke toestemming.
+            © 2026 Claudia Voogt. Alle rechten voorbehouden. Deze tool mag niet worden gedeeld, gekopieerd, nagebouwd of hergebruikt zonder schriftelijke toestemming.
           </div>
         </div>
       </div>
@@ -685,8 +685,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   brandFooterCopy: {
     fontFamily: 'Lora, serif',
     fontSize: '11px',
-    color: '#cdbcd9',
-    opacity: 0.65,
+    color: '#ffffff',
+    opacity: 0.9,
     marginTop: '6px',
   },
 };
