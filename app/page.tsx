@@ -18,6 +18,7 @@ interface BerekenResultaat {
   saldoNominaal: number;
   saldoNaInflatie: number;
   saldoBelegd: number;
+  saldoBelegdNaInflatie: number;
   eindwaardeNaInflatie: number;
 }
 
@@ -108,18 +109,18 @@ export default function SparenVsBeleggenPage() {
     const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
 
+    const gebruikSaldo = maandbedrag === 0;
+    const chartData = gebruikSaldo
+      ? [resultaat.saldoNominaal, resultaat.saldoNaInflatie, resultaat.saldoBelegd, resultaat.saldoBelegdNaInflatie]
+      : [resultaat.eindwaardeSparenNominaal, resultaat.waardeNaInflatie, resultaat.eindwaarde, resultaat.eindwaardeNaInflatie];
+
     chartInstance.current = new window.Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['Sparen', 'Sparen\nna inflatie', 'Beleggen', 'Beleggen\nna inflatie'],
         datasets: [
           {
-            data: [
-              resultaat.eindwaardeSparenNominaal,
-              resultaat.waardeNaInflatie,
-              resultaat.eindwaarde,
-              resultaat.eindwaardeNaInflatie,
-            ],
+            data: chartData,
             backgroundColor: ['#6B2D84', '#FF6B35', '#3EDCB1', '#1A1F36'],
             borderRadius: 10,
             borderSkipped: false,
@@ -157,7 +158,7 @@ export default function SparenVsBeleggenPage() {
         },
       },
     });
-  }, [resultaat]);
+  }, [resultaat, maandbedrag]);
 
   useEffect(() => {
     if (chartReady && resultaat) tekenChart();
@@ -400,10 +401,19 @@ export default function SparenVsBeleggenPage() {
           </div>
         )}
 
-        {/* VERGELIJKING: alleen tonen als er een maandbedrag is ingesteld */}
-        {resultaat && maandbedrag === 0 && (
+        {/* CHART: altijd tonen als er resultaat en saldo of maandbedrag is */}
+        {resultaat && (typeof huidigSaldo === 'number' && huidigSaldo > 0 || maandbedrag > 0) && (
+          <div style={styles.card}>
+            <div style={styles.chartTitle}>Het verschil in één oogopslag</div>
+            <div style={{ position: 'relative', height: '260px', width: '100%' }}>
+              <canvas ref={chartRef}></canvas>
+            </div>
+          </div>
+        )}
+
+        {resultaat && maandbedrag === 0 && !(typeof huidigSaldo === 'number' && huidigSaldo > 0) && (
           <div style={styles.hintBlock}>
-            Zet de schuif op een maandbedrag om het verschil tussen sparen en beleggen te zien.
+            Vul een spaarsaldo of maandelijkse inleg in om het verschil te zien.
           </div>
         )}
 
@@ -451,14 +461,6 @@ export default function SparenVsBeleggenPage() {
                   </strong>{' '}
                   na {jaren} jaar.
                 </div>
-              </div>
-            </div>
-
-            {/* CHART */}
-            <div style={styles.card}>
-              <div style={styles.chartTitle}>Het verschil in één oogopslag</div>
-              <div style={{ position: 'relative', height: '260px', width: '100%' }}>
-                <canvas ref={chartRef}></canvas>
               </div>
             </div>
 
