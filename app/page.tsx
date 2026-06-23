@@ -17,6 +17,7 @@ interface BerekenResultaat {
   verschil: number;
   saldoNominaal: number;
   saldoNaInflatie: number;
+  saldoBelegd: number;
 }
 
 function formatEuro(bedrag: number): string {
@@ -329,7 +330,82 @@ export default function SparenVsBeleggenPage() {
           <div style={styles.loadingBlock}>Bezig met rekenen...</div>
         )}
 
-        {resultaat && (
+        {/* SALDO BLOK: altijd tonen als er een saldo is, ook bij maandbedrag €0 */}
+        {resultaat && typeof huidigSaldo === 'number' && huidigSaldo > 0 && (
+          <div style={styles.card}>
+            <div style={styles.chartTitle}>Wat doet inflatie met jouw spaarsaldo?</div>
+            <div style={styles.resultRowInner}>
+              <div style={styles.resultCard}>
+                <div style={styles.resultLabel}>Huidig spaarsaldo</div>
+                <div style={{ ...styles.resultValue, color: '#1A1F36' }}>
+                  {formatEuro(huidigSaldo)}
+                </div>
+              </div>
+              <div style={styles.resultCard}>
+                <div style={styles.resultLabel}>Na {jaren} jaar</div>
+                <div style={{ ...styles.resultValue, color: '#6B2D84' }}>
+                  {formatEuro(resultaat.saldoNominaal)}
+                </div>
+              </div>
+            </div>
+            <div style={styles.resultRowInner}>
+              <div style={{ ...styles.resultCard, flex: 1 }}>
+                <div style={styles.resultLabel}>
+                  Over {jaren} jaar is jouw geld nog{' '}
+                  <strong style={{ color: '#FF6B35' }}>{formatEuro(resultaat.saldoNaInflatie)}</strong>{' '}
+                  waard.{' '}
+                  {(() => {
+                    const verlies = ((huidigSaldo - resultaat.saldoNaInflatie) / (huidigSaldo as number)) * 100;
+                    return verlies > 0
+                      ? <span style={{ color: '#E21B70', fontWeight: 800 }}>Dat is een verlies van {verlies.toFixed(1).replace('.', ',')}%.</span>
+                      : <span style={{ color: '#3EDCB1', fontWeight: 800 }}>Dat is een winst van {Math.abs(verlies).toFixed(1).replace('.', ',')}%.</span>;
+                  })()}
+                </div>
+              </div>
+            </div>
+            <div style={styles.noteText}>
+              Bij {formatProcent(spaarrente)} spaarrente groeit je saldo naar{' '}
+              <strong>{formatEuro(resultaat.saldoNominaal)}</strong>, maar door{' '}
+              {formatProcent(inflatie)} inflatie per jaar is de echte koopkracht nog maar{' '}
+              <strong>{formatEuro(resultaat.saldoNaInflatie)}</strong>.
+            </div>
+
+            {/* SALDO BELEGGEN VERGELIJKING */}
+            <div style={{ marginTop: '20px', borderTop: '1px solid #E8E5F0', paddingTop: '16px' }}>
+              <div style={styles.chartTitle}>Wat als je dit saldo zou beleggen?</div>
+              <div style={styles.resultRowInner}>
+                <div style={styles.resultCard}>
+                  <div style={styles.resultLabel}>Sparen (koopkracht)</div>
+                  <div style={{ ...styles.resultValue, color: '#FF6B35' }}>
+                    {formatEuro(resultaat.saldoNaInflatie)}
+                  </div>
+                </div>
+                <div style={styles.resultCard}>
+                  <div style={styles.resultLabel}>Beleggen (10% p.j.)</div>
+                  <div style={{ ...styles.resultValue, color: '#3EDCB1' }}>
+                    {formatEuro(resultaat.saldoBelegd)}
+                  </div>
+                </div>
+              </div>
+              <div style={{ ...styles.diffBlock, margin: 0, borderRadius: '12px' }}>
+                <div style={styles.diffLabel}>Door te beleggen kun je</div>
+                <div style={styles.diffValue}>
+                  {formatEuro(resultaat.saldoBelegd - resultaat.saldoNaInflatie)}
+                </div>
+                <div style={styles.diffLabel}>meer hebben dan met sparen</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VERGELIJKING: alleen tonen als er een maandbedrag is ingesteld */}
+        {resultaat && maandbedrag === 0 && (
+          <div style={styles.hintBlock}>
+            Zet de schuif op een maandbedrag om het verschil tussen sparen en beleggen te zien.
+          </div>
+        )}
+
+        {resultaat && maandbedrag > 0 && (
           <>
             {/* SPAREN UITLEG */}
             <div style={styles.infoBlock}>
@@ -358,42 +434,6 @@ export default function SparenVsBeleggenPage() {
                 </div>
               </div>
             </div>
-
-            {/* HUIDIG SPAARSALDO */}
-            {typeof huidigSaldo === 'number' && huidigSaldo > 0 && (
-              <div style={styles.card}>
-                <div style={styles.chartTitle}>Wat doet inflatie met jouw spaarsaldo?</div>
-                <div style={styles.resultRowInner}>
-                  <div style={styles.resultCard}>
-                    <div style={styles.resultLabel}>Huidig spaarsaldo</div>
-                    <div style={{ ...styles.resultValue, color: '#1A1F36' }}>
-                      {formatEuro(huidigSaldo)}
-                    </div>
-                  </div>
-                  <div style={styles.resultCard}>
-                    <div style={styles.resultLabel}>Nominaal na {jaren} jaar</div>
-                    <div style={{ ...styles.resultValue, color: '#6B2D84' }}>
-                      {formatEuro(resultaat.saldoNominaal)}
-                    </div>
-                  </div>
-                </div>
-                <div style={styles.resultRowInner}>
-                  <div style={{ ...styles.resultCard, flex: 1 }}>
-                    <div style={styles.resultLabel}>Koopkracht over {jaren} jaar</div>
-                    <div style={{ ...styles.resultValue, color: '#FF6B35' }}>
-                      {formatEuro(resultaat.saldoNaInflatie)}
-                    </div>
-                  </div>
-                </div>
-                <div style={styles.noteText}>
-                  Bij {formatProcent(spaarrente)} spaarrente groeit je saldo nominaal naar{' '}
-                  <strong>{formatEuro(resultaat.saldoNominaal)}</strong>. Maar door{' '}
-                  {formatProcent(inflatie)} inflatie per jaar is de echte koopkracht nog maar{' '}
-                  <strong>{formatEuro(resultaat.saldoNaInflatie)}</strong>. Dit saldo is{' '}
-                  <strong>niet</strong> meegerekend bij beleggen hieronder.
-                </div>
-              </div>
-            )}
 
             {/* BELEGGEN UITLEG */}
             <div style={styles.infoBlockDark}>
