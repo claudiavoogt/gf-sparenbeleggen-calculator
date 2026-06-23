@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       typeof spaarrente !== 'number' ||
       jaren < 1 ||
       jaren > 30 ||
-      maandbedrag < 5 ||
-      maandbedrag > 100 ||
+      maandbedrag < 0 ||
+      maandbedrag > 1000 ||
       huidigSaldo < 0 ||
       huidigSaldo > 1000000 ||
       inflatie < 0 ||

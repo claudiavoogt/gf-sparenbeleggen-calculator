@@ -279,9 +279,9 @@ export default function SparenVsBeleggenPage() {
             </div>
             <input
               type="range"
-              min="5"
-              max="100"
-              step="5"
+              min="0"
+              max="1000"
+              step="10"
               value={maandbedrag}
               onChange={(e) => setMaandbedrag(Number(e.target.value))}
             />
