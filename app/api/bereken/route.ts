@@ -18,6 +18,7 @@ interface BerekenResultaat {
   saldoNominaal: number;
   saldoNaInflatie: number;
   saldoBelegd: number;
+  eindwaardeNaInflatie: number;
 }
 
 const RENDEMENT = 0.10;
@@ -109,6 +110,7 @@ export async function POST(request: NextRequest) {
       saldoNominaal: saldo.saldoNominaal,
       saldoNaInflatie: saldo.saldoNaInflatie,
       saldoBelegd: huidigSaldo * Math.pow(1 + RENDEMENT, jaren),
+      eindwaardeNaInflatie: beleggen.eindwaarde / Math.pow(1 + inflatieDecimaal, jaren),
     };
 
     return NextResponse.json(resultaat);

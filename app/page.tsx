@@ -18,6 +18,7 @@ interface BerekenResultaat {
   saldoNominaal: number;
   saldoNaInflatie: number;
   saldoBelegd: number;
+  eindwaardeNaInflatie: number;
 }
 
 function formatEuro(bedrag: number): string {
@@ -110,15 +111,16 @@ export default function SparenVsBeleggenPage() {
     chartInstance.current = new window.Chart(ctx, {
       type: 'bar',
       data: {
-        labels: [['Ingelegd'], ['Spaargeld', 'na inflatie'], ['Belegd', 'vermogen']],
+        labels: [['Ingelegd'], ['Spaargeld', 'na inflatie'], ['Belegd', 'vermogen'], ['Belegd', 'na inflatie']],
         datasets: [
           {
             data: [
               resultaat.totaalIngelegd,
               resultaat.waardeNaInflatie,
               resultaat.eindwaarde,
+              resultaat.eindwaardeNaInflatie,
             ],
-            backgroundColor: ['#1A1F36', '#FF6B35', '#3EDCB1'],
+            backgroundColor: ['#1A1F36', '#FF6B35', '#3EDCB1', '#A8F0E0'],
             borderRadius: 10,
             borderSkipped: false,
           },
