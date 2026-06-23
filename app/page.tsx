@@ -10,10 +10,12 @@ declare global {
 
 interface BerekenResultaat {
   totaalIngelegd: number;
+  eindwaardeSparenNominaal: number;
   waardeNaInflatie: number;
   eindwaarde: number;
   totaalIngelegdBeleggen: number;
   verschil: number;
+  saldoNominaal: number;
   saldoNaInflatie: number;
 }
 
@@ -25,9 +27,15 @@ function formatEuro(bedrag: number): string {
   }).format(bedrag);
 }
 
+function formatProcent(waarde: number): string {
+  return waarde.toFixed(1).replace('.', ',') + '%';
+}
+
 export default function SparenVsBeleggenPage() {
   const [huidigSaldo, setHuidigSaldo] = useState<number | ''>('');
+  const [spaarrente, setSpaarrente] = useState<number>(1.5);
   const [maandbedrag, setMaandbedrag] = useState<number>(10);
+  const [inflatie, setInflatie] = useState<number>(3.5);
   const [jaren, setJaren] = useState<number>(15);
   const [resultaat, setResultaat] = useState<BerekenResultaat | null>(null);
   const [laden, setLaden] = useState<boolean>(true);
@@ -46,7 +54,13 @@ export default function SparenVsBeleggenPage() {
     fetch('/api/bereken', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jaren, maandbedrag, huidigSaldo: huidigSaldo === '' ? 0 : huidigSaldo }),
+      body: JSON.stringify({
+        jaren,
+        maandbedrag,
+        huidigSaldo: huidigSaldo === '' ? 0 : huidigSaldo,
+        inflatie,
+        spaarrente,
+      }),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Berekening mislukt');
@@ -68,7 +82,7 @@ export default function SparenVsBeleggenPage() {
     return () => {
       actief = false;
     };
-  }, [jaren, maandbedrag, huidigSaldo]);
+  }, [jaren, maandbedrag, huidigSaldo, inflatie, spaarrente]);
 
   // Chart.js laden via CDN
   useEffect(() => {
@@ -211,6 +225,7 @@ export default function SparenVsBeleggenPage() {
 
         {/* INVOER */}
         <div style={styles.card}>
+          {/* SALDO INPUT */}
           <div style={styles.sliderRow}>
             <div style={styles.sliderLabel}>Saldo van spaargeld op je spaarrekening</div>
             <div style={styles.inputWrapper}>
@@ -237,9 +252,30 @@ export default function SparenVsBeleggenPage() {
             </div>
           </div>
 
+          {/* SPAARRENTE SLIDER */}
           <div style={styles.sliderRow}>
             <div style={styles.sliderLabel}>
-              Hoeveel spaar je per maand? <span style={styles.sliderValue}>{formatEuro(maandbedrag)}</span>
+              Spaarrente per jaar{' '}
+              <span style={styles.sliderValue}>{formatProcent(spaarrente)}</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="5"
+              step="0.25"
+              value={spaarrente}
+              onChange={(e) => setSpaarrente(Number(e.target.value))}
+            />
+            <div style={styles.sliderTip}>
+              Gemiddelde spaarrente bij Nederlandse banken ligt nu rond de 1,5%.
+            </div>
+          </div>
+
+          {/* MAANDBEDRAG SLIDER */}
+          <div style={styles.sliderRow}>
+            <div style={styles.sliderLabel}>
+              Hoeveel spaar je per maand?{' '}
+              <span style={styles.sliderValue}>{formatEuro(maandbedrag)}</span>
             </div>
             <input
               type="range"
@@ -251,6 +287,26 @@ export default function SparenVsBeleggenPage() {
             />
           </div>
 
+          {/* INFLATIE SLIDER */}
+          <div style={styles.sliderRow}>
+            <div style={styles.sliderLabel}>
+              Inflatie per jaar{' '}
+              <span style={styles.sliderValue}>{formatProcent(inflatie)}</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="0.5"
+              value={inflatie}
+              onChange={(e) => setInflatie(Number(e.target.value))}
+            />
+            <div style={styles.sliderTip}>
+              Historisch gemiddelde EU-inflatie: ±2–3%. In 2022 liep het op tot 10%+.
+            </div>
+          </div>
+
+          {/* JAREN SLIDER */}
           <div style={{ ...styles.sliderRow, marginBottom: 0 }}>
             <div style={styles.sliderLabel}>
               Over hoeveel jaar wil je je vermogen bekijken?{' '}
@@ -283,20 +339,22 @@ export default function SparenVsBeleggenPage() {
                   Spaargeld verliest elk jaar waarde door inflatie.
                 </div>
                 <div style={styles.infoText}>
-                  Je legt elke maand {formatEuro(maandbedrag)} opzij. Na {jaren} jaar heb je{' '}
-                  <strong>{formatEuro(resultaat.totaalIngelegd)}</strong> gespaard. Klinkt goed,
-                  toch? Maar door inflatie van <strong>2,5% per jaar</strong> kun je daar straks
-                  minder mee kopen. In waarde van vandaag is dat nog maar{' '}
+                  Je legt elke maand {formatEuro(maandbedrag)} opzij. Bij een spaarrente van{' '}
+                  <strong>{formatProcent(spaarrente)}</strong> staat er na {jaren} jaar nominaal{' '}
+                  <strong>{formatEuro(resultaat.eindwaardeSparenNominaal)}</strong> op je
+                  rekening. Klinkt goed, toch? Maar door inflatie van{' '}
+                  <strong>{formatProcent(inflatie)} per jaar</strong> kun je daar straks minder
+                  mee kopen. In koopkracht van vandaag is dat nog maar{' '}
                   <strong style={{ color: '#FF6B35' }}>
                     {formatEuro(resultaat.waardeNaInflatie)}
                   </strong>
                   .
                 </div>
                 <div style={styles.warningBlock}>
-                  Let op: een inflatie van <strong>2%</strong> per jaar is <strong>normaal</strong>.
-                  Maar inflatie kan ook <strong>jarenlang hoger</strong> liggen, zoals je de
-                  afgelopen jaren hebt gezien. Hoe hoger de inflatie, hoe <strong>sneller</strong>{' '}
-                  je spaargeld zijn waarde verliest.
+                  Let op: een inflatie van <strong>2–3%</strong> per jaar is{' '}
+                  <strong>normaal</strong>. Maar inflatie kan ook <strong>jarenlang hoger</strong>{' '}
+                  liggen, zoals je de afgelopen jaren hebt gezien. Hoe hoger de inflatie, hoe{' '}
+                  <strong>sneller</strong> je spaargeld zijn waarde verliest.
                 </div>
               </div>
             </div>
@@ -313,15 +371,26 @@ export default function SparenVsBeleggenPage() {
                     </div>
                   </div>
                   <div style={styles.resultCard}>
-                    <div style={styles.resultLabel}>Waard over {jaren} jaar</div>
+                    <div style={styles.resultLabel}>Nominaal na {jaren} jaar</div>
+                    <div style={{ ...styles.resultValue, color: '#6B2D84' }}>
+                      {formatEuro(resultaat.saldoNominaal)}
+                    </div>
+                  </div>
+                </div>
+                <div style={styles.resultRowInner}>
+                  <div style={{ ...styles.resultCard, flex: 1 }}>
+                    <div style={styles.resultLabel}>Koopkracht over {jaren} jaar</div>
                     <div style={{ ...styles.resultValue, color: '#FF6B35' }}>
                       {formatEuro(resultaat.saldoNaInflatie)}
                     </div>
                   </div>
                 </div>
                 <div style={styles.noteText}>
-                  Dit saldo is <strong>niet</strong> meegerekend bij beleggen hieronder. Dat gaat
-                  alleen over je maandelijkse inleg.
+                  Bij {formatProcent(spaarrente)} spaarrente groeit je saldo nominaal naar{' '}
+                  <strong>{formatEuro(resultaat.saldoNominaal)}</strong>. Maar door{' '}
+                  {formatProcent(inflatie)} inflatie per jaar is de echte koopkracht nog maar{' '}
+                  <strong>{formatEuro(resultaat.saldoNaInflatie)}</strong>. Dit saldo is{' '}
+                  <strong>niet</strong> meegerekend bij beleggen hieronder.
                 </div>
               </div>
             )}
@@ -472,6 +541,13 @@ const styles: { [key: string]: React.CSSProperties } = {
   sliderValue: {
     color: '#E21B70',
     fontWeight: 800,
+  },
+  sliderTip: {
+    fontFamily: 'Lora, serif',
+    fontStyle: 'italic',
+    fontSize: '11px',
+    color: '#999',
+    marginTop: '6px',
   },
   inputWrapper: {
     display: 'flex',
