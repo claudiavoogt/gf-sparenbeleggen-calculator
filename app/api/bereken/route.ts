@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       typeof inflatie !== 'number' ||
       typeof spaarrente !== 'number' ||
       jaren < 1 ||
-      jaren > 30 ||
+      jaren > 60 ||
       maandbedrag < 0 ||
       maandbedrag > 1000 ||
       huidigSaldo < 0 ||

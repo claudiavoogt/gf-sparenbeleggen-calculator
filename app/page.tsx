@@ -318,7 +318,7 @@ export default function SparenVsBeleggenPage() {
             <input
               type="range"
               min="1"
-              max="30"
+              max="60"
               step="1"
               value={jaren}
               onChange={(e) => setJaren(Number(e.target.value))}
