@@ -111,16 +111,16 @@ export default function SparenVsBeleggenPage() {
     chartInstance.current = new window.Chart(ctx, {
       type: 'bar',
       data: {
-        labels: [['Ingelegd'], ['Spaargeld', 'na inflatie'], ['Belegd', 'vermogen'], ['Belegd', 'na inflatie']],
+        labels: ['Sparen', 'Sparen\nna inflatie', 'Beleggen', 'Beleggen\nna inflatie'],
         datasets: [
           {
             data: [
-              resultaat.totaalIngelegd,
+              resultaat.eindwaardeSparenNominaal,
               resultaat.waardeNaInflatie,
               resultaat.eindwaarde,
               resultaat.eindwaardeNaInflatie,
             ],
-            backgroundColor: ['#1A1F36', '#FF6B35', '#3EDCB1', '#A8F0E0'],
+            backgroundColor: ['#6B2D84', '#FF6B35', '#3EDCB1', '#1A1F36'],
             borderRadius: 10,
             borderSkipped: false,
           },
@@ -149,7 +149,7 @@ export default function SparenVsBeleggenPage() {
           },
           x: {
             ticks: {
-              font: { family: 'Montserrat', size: 12, weight: '700' },
+              font: { family: 'Montserrat', size: 11, weight: '700' },
               color: '#1A1F36',
             },
             grid: { display: false },
@@ -463,17 +463,29 @@ export default function SparenVsBeleggenPage() {
             </div>
 
             {/* CIJFERS */}
-            <div style={styles.resultRow}>
-              <div style={styles.resultCard}>
-                <div style={styles.resultLabel}>Spaargeld na inflatie</div>
-                <div style={{ ...styles.resultValue, color: '#FF6B35' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', margin: '0 16px' }}>
+              <div style={{ ...styles.resultCard, flex: '1 1 calc(50% - 6px)' }}>
+                <div style={styles.resultLabel}>Sparen</div>
+                <div style={{ ...styles.resultValue, color: '#6B2D84', fontSize: '17px' }}>
+                  {formatEuro(resultaat.eindwaardeSparenNominaal)}
+                </div>
+              </div>
+              <div style={{ ...styles.resultCard, flex: '1 1 calc(50% - 6px)' }}>
+                <div style={styles.resultLabel}>Sparen na inflatie</div>
+                <div style={{ ...styles.resultValue, color: '#FF6B35', fontSize: '17px' }}>
                   {formatEuro(resultaat.waardeNaInflatie)}
                 </div>
               </div>
-              <div style={styles.resultCard}>
-                <div style={styles.resultLabel}>Belegd vermogen</div>
-                <div style={{ ...styles.resultValue, color: '#3EDCB1' }}>
+              <div style={{ ...styles.resultCard, flex: '1 1 calc(50% - 6px)' }}>
+                <div style={styles.resultLabel}>Beleggen</div>
+                <div style={{ ...styles.resultValue, color: '#3EDCB1', fontSize: '17px' }}>
                   {formatEuro(resultaat.eindwaarde)}
+                </div>
+              </div>
+              <div style={{ ...styles.resultCard, flex: '1 1 calc(50% - 6px)' }}>
+                <div style={styles.resultLabel}>Beleggen na inflatie</div>
+                <div style={{ ...styles.resultValue, color: '#1A1F36', fontSize: '17px' }}>
+                  {formatEuro(resultaat.eindwaardeNaInflatie)}
                 </div>
               </div>
             </div>
