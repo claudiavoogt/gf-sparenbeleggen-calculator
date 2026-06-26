@@ -351,21 +351,52 @@ export default function SparenVsBeleggenPage() {
                 </div>
               </div>
             </div>
-            <div style={styles.resultRowInner}>
-              <div style={{ ...styles.resultCard, flex: 1 }}>
-                <div style={styles.resultLabel}>
-                  Over {jaren} jaar is jouw geld nog{' '}
-                  <strong style={{ color: '#FF6B35' }}>{formatEuro(resultaat.saldoNaInflatie)}</strong>{' '}
-                  waard.{' '}
-                  {(() => {
-                    const verlies = ((huidigSaldo - resultaat.saldoNaInflatie) / (huidigSaldo as number)) * 100;
-                    return verlies > 0
-                      ? <span style={{ color: '#E21B70', fontWeight: 800 }}>Dat is een verlies van {verlies.toFixed(1).replace('.', ',')}%.</span>
-                      : <span style={{ color: '#3EDCB1', fontWeight: 800 }}>Dat is een winst van {Math.abs(verlies).toFixed(1).replace('.', ',')}%.</span>;
-                  })()}
+            {(() => {
+              const verlies = ((huidigSaldo as number - resultaat.saldoNaInflatie) / (huidigSaldo as number)) * 100;
+              const isVerlies = verlies > 0;
+              return (
+                <div style={{
+                  background: isVerlies ? '#FFF0F5' : '#F0FDF8',
+                  border: `3px solid ${isVerlies ? '#E21B70' : '#3EDCB1'}`,
+                  borderRadius: '16px',
+                  padding: '24px 20px',
+                  textAlign: 'center',
+                  marginBottom: '14px',
+                }}>
+                  <div style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    color: '#1A1F36',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '10px',
+                  }}>
+                    Over {jaren} jaar is jouw geld nog waard
+                  </div>
+                  <div style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 800,
+                    fontSize: '42px',
+                    color: isVerlies ? '#E21B70' : '#3EDCB1',
+                    lineHeight: '1.1',
+                    marginBottom: '12px',
+                  }}>
+                    {formatEuro(resultaat.saldoNaInflatie)}
+                  </div>
+                  <div style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 800,
+                    fontSize: '18px',
+                    color: isVerlies ? '#B72452' : '#1A7A55',
+                  }}>
+                    {isVerlies
+                      ? `Dat is een verlies van ${verlies.toFixed(1).replace('.', ',')}%.`
+                      : `Dat is een winst van ${Math.abs(verlies).toFixed(1).replace('.', ',')}%.`}
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
             <div style={styles.noteText}>
               Bij {formatProcent(spaarrente)} spaarrente groeit je saldo naar{' '}
               <strong>{formatEuro(resultaat.saldoNominaal)}</strong>, maar door{' '}
