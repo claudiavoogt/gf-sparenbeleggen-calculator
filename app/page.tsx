@@ -539,9 +539,7 @@ export default function SparenVsBeleggenPage() {
         )}
 
         <div style={styles.footer}>
-          Let op: dit is een rekenvoorbeeld. Ook bij beleggen knaagt inflatie, maar het
-          rendement ligt veel hoger. Rendementen uit het verleden bieden geen garantie voor de
-          toekomst.
+          Deze tool is een hulpmiddel, geen beleggingsadvies. De informatie is met zorg samengesteld, maar er kunnen geen rechten aan worden ontleend. Juistheid en volledigheid worden niet gegarandeerd.
         </div>
 
         <div style={styles.brandFooter}>
