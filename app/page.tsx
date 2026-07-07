@@ -459,7 +459,7 @@ export default function SparenVsBeleggenPage() {
                 </div>
                 <div style={styles.infoText}>
                   Je legt elke maand {formatEuro(maandbedrag)} opzij. Bij een spaarrente van{' '}
-                  <strong>{formatProcent(spaarrente)}</strong> staat er na {jaren} jaar nominaal{' '}
+                  <strong>{formatProcent(spaarrente)}</strong> staat er na {jaren} jaar{' '}
                   <strong>{formatEuro(resultaat.eindwaardeSparenNominaal)}</strong> op je
                   rekening. Klinkt goed, toch? Maar door inflatie van{' '}
                   <strong>{formatProcent(inflatie)} per jaar</strong> kun je daar straks minder

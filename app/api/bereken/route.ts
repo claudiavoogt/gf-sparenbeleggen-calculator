@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       waardeNaInflatie: sparen.waardeNaInflatie,
       eindwaarde: beleggen.eindwaarde,
       totaalIngelegdBeleggen: beleggen.totaalIngelegdBeleggen,
-      verschil: beleggen.eindwaarde - sparen.waardeNaInflatie,
+      verschil: (beleggen.eindwaarde / Math.pow(1 + inflatieDecimaal, jaren)) - sparen.waardeNaInflatie,
       saldoNominaal: saldo.saldoNominaal,
       saldoNaInflatie: saldo.saldoNaInflatie,
       saldoBelegd: huidigSaldo * Math.pow(1 + RENDEMENT, jaren),
