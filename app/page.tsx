@@ -489,9 +489,9 @@ export default function SparenVsBeleggenPage() {
                   <strong style={{ color: '#3EDCB1' }}>
                     {formatEuro(resultaat.eindwaarde)}
                   </strong>{' '}
-                  na {jaren} jaar. Let op: ook belegd geld verliest waarde door inflatie, in
-                  koopkracht van vandaag is dat{' '}
-                  <strong>{formatEuro(resultaat.eindwaardeNaInflatie)}</strong>.
+                  na {jaren} jaar. Let op: ook belegd geld verliest waarde door inflatie.
+                  Eigenlijk is je geld dan nog{' '}
+                  <strong>{formatEuro(resultaat.eindwaardeNaInflatie)}</strong> waard.
                 </div>
               </div>
             </div>
