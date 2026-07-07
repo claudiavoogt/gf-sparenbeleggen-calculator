@@ -240,7 +240,7 @@ export default function SparenVsBeleggenPage() {
                 min="0"
                 max="1000000"
                 step="100"
-                placeholder="Bijvoorbeeld 5.000"
+                placeholder="Bijvoorbeeld 500"
                 value={huidigSaldo}
                 onChange={(e) => {
                   const ruw = e.target.value;
