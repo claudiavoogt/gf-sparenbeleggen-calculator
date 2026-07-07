@@ -463,11 +463,11 @@ export default function SparenVsBeleggenPage() {
                   <strong>{formatEuro(resultaat.eindwaardeSparenNominaal)}</strong> op je
                   rekening. Klinkt goed, toch? Maar door inflatie van{' '}
                   <strong>{formatProcent(inflatie)} per jaar</strong> kun je daar straks minder
-                  mee kopen. In koopkracht van vandaag is dat nog maar{' '}
+                  mee kopen. Eigenlijk is je geld dan nog maar{' '}
                   <strong style={{ color: '#FF6B35' }}>
                     {formatEuro(resultaat.waardeNaInflatie)}
-                  </strong>
-                  .
+                  </strong>{' '}
+                  waard.
                 </div>
                 <div style={styles.warningBlock}>
                   Let op: een inflatie van <strong>2–3%</strong> per jaar is{' '}
