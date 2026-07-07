@@ -485,12 +485,13 @@ export default function SparenVsBeleggenPage() {
                 <div style={styles.infoTitleLight}>Beleggen laat je geld voor je werken.</div>
                 <div style={styles.infoTextLight}>
                   Stop je datzelfde bedrag elke maand in beleggingen met gemiddeld{' '}
-                  <strong>10% rendement per jaar</strong>, dan kan je inleg groeien van{' '}
-                  {formatEuro(resultaat.totaalIngelegdBeleggen)} naar maar liefst{' '}
+                  <strong>10% rendement per jaar</strong>, dan kan dat groeien naar maar liefst{' '}
                   <strong style={{ color: '#3EDCB1' }}>
                     {formatEuro(resultaat.eindwaarde)}
                   </strong>{' '}
-                  na {jaren} jaar.
+                  na {jaren} jaar. Let op: ook belegd geld verliest waarde door inflatie, in
+                  koopkracht van vandaag is dat{' '}
+                  <strong>{formatEuro(resultaat.eindwaardeNaInflatie)}</strong>.
                 </div>
               </div>
             </div>
